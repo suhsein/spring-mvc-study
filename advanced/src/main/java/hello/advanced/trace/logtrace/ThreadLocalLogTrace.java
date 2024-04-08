@@ -1,39 +1,44 @@
-package hello.advanced.trace.hellotrace;
+package hello.advanced.trace.logtrace;
 
 import hello.advanced.trace.TraceId;
 import hello.advanced.trace.TraceStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
-public class HelloTraceV2 {
-
+public class ThreadLocalLogTrace implements LogTrace{
     private final String START_PREFIX = "-->";
     private final String COMPLETE_PREFIX = "<--";
     private final String EX_PREFIX = "<X-";
-    public TraceStatus begin(String message){
-        TraceId traceId = new TraceId();
+
+//    private TraceId traceIdHolder; // traceId 동기화, 동시성 이슈 발생
+    private ThreadLocal<TraceId> traceIdHolder = new ThreadLocal<>();
+    @Override
+    public TraceStatus begin(String message) {
+        syncTraceId();
+        TraceId traceId = traceIdHolder.get();
         Long startTimeMs = System.currentTimeMillis();
         log.info("[{}] {}{}", traceId.getId(), addSpace(START_PREFIX, traceId.getLevel()), message);
         return new TraceStatus(traceId, startTimeMs, message);
     }
 
-    // V2에서 추가
-    public TraceStatus beginSync(TraceId beforeTraceId, String message){
-        TraceId nextId = beforeTraceId.createNextId();
-        Long startTimeMs = System.currentTimeMillis();
-        log.info("[{}] {}{}", nextId.getId(), addSpace(START_PREFIX, nextId.getLevel()), message);
-        return new TraceStatus(nextId, startTimeMs, message);
+    private void syncTraceId(){
+        TraceId traceId = traceIdHolder.get();
+        if(traceId == null){
+            traceIdHolder.set(new TraceId());
+        }else{
+            traceIdHolder.set(traceId.createNextId());
+        }
     }
-
-    public void end(TraceStatus status){
+    @Override
+    public void end(TraceStatus status) {
         complete(status, null);
     }
 
-    public void exception(TraceStatus status, Exception e){
+    @Override
+    public void exception(TraceStatus status, Exception e) {
         complete(status, e);
     }
+
 
     private void complete(TraceStatus status, Exception e){
         Long stopTimeMs = System.currentTimeMillis();
@@ -43,6 +48,17 @@ public class HelloTraceV2 {
             log.info("[{}] {}{} time={}ms", traceId.getId(), addSpace(COMPLETE_PREFIX, traceId.getLevel()), status.getMessage(), resultTimeMs);
         }else {
             log.info("[{}] {}{} time={}ms ex={}", traceId.getId(), addSpace(EX_PREFIX, traceId.getLevel()), status.getMessage(), resultTimeMs, e.toString());
+        }
+
+        releaseTraceId();
+    }
+
+    private void releaseTraceId() {
+        TraceId traceId = traceIdHolder.get();
+        if (traceId.isFirstLevel()) {
+            traceIdHolder.remove(); // destroy
+        } else{
+            traceIdHolder.set(traceId.createPreviousId());
         }
     }
 
