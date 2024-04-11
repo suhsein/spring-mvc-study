@@ -3,17 +3,12 @@ package hello.advanced.trace.strategy.code.strategy;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 필드에 전략을 보관하는 방식. 의존 관계 주입을 통한 선 조립 후 실행
- * -> 실시간으로 전략을 바꾸기는 어렵다.
+ * 전략을 파라미터로 전달 받는 방식
+ * 실행 시 파라미터로 전략을 받는 유연성
  */
 @Slf4j
-public class ContextV1 {
-    private Strategy strategy;
-    public ContextV1(Strategy strategy){
-        this.strategy = strategy;
-    }
-
-    public void execute(){
+public class ContextV2 {
+    public void execute(Strategy strategy){
         long startTime = System.currentTimeMillis();
         // 비즈니스 로직 실행
         strategy.call(); // 위임
