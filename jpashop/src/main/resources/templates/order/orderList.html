@@ -30,29 +30,32 @@
       <tr>
         <th>#</th>
         <th>회원명</th>
-        <th>대표상품 이름</th>
-        <th>대표상품 주문가격</th>
-        <th>대표상품 주문수량</th>
+        <th>상품 이름</th>
+        <th>상품 주문가격</th>
+        <th>상품 주문수량</th>
         <th>상태</th>
         <th>일시</th>
         <th></th>
       </tr>
       </thead>
       <tbody>
-      <tr th:each="order : ${orders}">
-        <td th:text="${order.id}"></td>
-        <td th:text="${order.member.name}"></td>
-        <td th:text="${order.orderItems[0].item.name}"></td>
-        <td th:text="${order.orderItems[0].item.price}"></td>
-        <td th:text="${order.orderItems[0].count}"></td>
-        <td th:text="${order.orderStatus}"></td>
-        <td th:text="${order.orderDate}"></td>
-        <td>
-          <a th:if="${order.orderStatus.name == 'ORDER'}" href="#"
-              th:href="|javascript:cancel(${order.id})|"
-              class="btn btn-danger">CANCEL</a>
-        </td>
-      </tr>
+      <!--  하나의 Order 에서 대표 상품만 보여주는 것이 아닌 모든 상품 목록 보여주는 것으로 수정    -->
+      <th:block th:each="order : ${orders}">
+        <tr th:each="orderItem: ${order.orderItems}">
+          <td th:text="${order.id}"></td>
+          <td th:text="${order.member.name}"></td>
+          <td th:text="${orderItem.item.price}"></td>
+          <td th:text="${orderItem.item.price}"></td>
+          <td th:text="${orderItem.count}"></td>
+          <td th:text="${order.orderStatus}"></td>
+          <td th:text="${order.orderDate}"></td>
+          <td>
+            <a th:if="${order.orderStatus.name == 'ORDER'}" href="#"
+               th:href="|javascript:cancel(${order.id})|"
+               class="btn btn-danger">CANCEL</a>
+          </td>
+        </tr>
+      </th:block>
       </tbody>
     </table>
   </div>
