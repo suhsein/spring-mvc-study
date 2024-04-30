@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toList;
  *
  * 컨트롤러에서 처리하던 쿼리를 쿼리 서비스로 분리하여, 트랜잭션 내에서 쿼리 할 수 있도록 함
  *
- * OSIV 는 실시간 트래픽이 큰 애플리케이션에서는 끄는 것을 추천. DB 커넥션이 모자랄 수 있기 대문에
+ * OSIV 는 실시간 트래픽이 큰 애플리케이션에서는 끄는 것을 추천. DB 커넥션이 모자랄 수 있기 때문에
  */
 @Service
 @Transactional(readOnly = true)

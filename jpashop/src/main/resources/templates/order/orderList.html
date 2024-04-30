@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header">
+<head th:replace="~{fragments/header :: header}">
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
@@ -60,7 +60,7 @@
     </table>
   </div>
 
-  <div th:replace="fragments/footer :: footer"/>
+  <div th:replace="~{fragments/footer :: footer}"/>
 </div><!-- /container -->
 </body>
 <script>
