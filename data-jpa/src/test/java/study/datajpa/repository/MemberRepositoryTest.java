@@ -226,6 +226,7 @@ class MemberRepositoryTest {
      * @EntityGraph 어노테이션을 사용해서 따로 fetch join 을 위한 jpql 을 짜지 않아도 된다. (필요에 따라 @Override 사용)
      * 내부적으로 fetch join 하게 됨. jpql 위에 @EntityGraph 붙이는 것도 가능하다.
      */
+
     @Test
     void findMemberLazy(){
         // given
@@ -288,6 +289,11 @@ class MemberRepositoryTest {
 
         // when
         List<Member> result = memberRepository.findLockByUsername("member1");
+    }
+
+    @Test
+    public void callCustom(){
+        List<Member> result = memberRepository.findMemberCustom();
 
     }
 }

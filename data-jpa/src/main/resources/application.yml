@@ -12,6 +12,14 @@ spring:
       hibernate:
 #        show_sql: true
         format_sql: true
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 2000
+#        one-indexed-parameters: true
+        # 요청 시 페이지 파라미터를 -1 처리. 보여지는 것은 1번 인덱스로 시작하는 것처럼 보이지만, 실제로 json 내부를 보면 인덱스 그대로
+        # (0번 페이지 요청해도 0번 리턴.)
 logging:
   level:
     org.hibernate.SQL: debug
