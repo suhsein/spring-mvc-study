@@ -10,11 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberSearchCondition;
 import study.querydsl.dto.MemberTeamDto;
 import study.querydsl.entity.Member;
+import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static study.querydsl.entity.QMember.member;
 
 @SpringBootTest
 @Transactional
@@ -103,5 +105,39 @@ class MemberRepositoryTest {
         assertThat(result.getContent()).extracting("username")
                 .containsExactly("member1", "member2", "member3");
 
+    }
+
+    /**
+     * QueryDSL Predicate Executor
+     * 리포지토리가 상속받도록 해서 사용 가능함.
+     *
+     * 기능 : 스프링 데이터 jpa 기본 메서드들에 querydsl 프레디킷을 적용할 수 있음
+     * 한계 : 1. 조인 불가능(묵시적 조인은 가능하지만, left join 불가능함.)
+     *       2. 서비스 계층을 querydsl 에 의존적으로 구현하게 됨.
+     *       3. 복잡한 실무환경에서 사용하기에는 한계가 명확함.
+     * 권장 안 함.
+     */
+    @Test
+    void querydslPredicateExecutorTest(){
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        em.persist(teamA);
+        em.persist(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 20, teamA);
+
+        Member member3 = new Member("member3", 30, teamB);
+        Member member4 = new Member("member4", 40, teamB);
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(member3);
+        em.persist(member4);
+
+        Iterable<Member> result = memberRepository.findAll(member.age.between(20, 40).and(member.username.eq("member2")));
+        for (Member member : result) {
+            System.out.println("member = " + member);
+        }
     }
 }
